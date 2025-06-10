@@ -8,7 +8,7 @@
                               -------------------
         begin                : 2024-12-15
         git sha              : $Format:%H$
-        copyright            : (C) 2024 by Oliver Harig
+        copyright            : (C) 2025 by Oliver Harig
         email                : ottmar.hittzfeld@web.de
  ***************************************************************************/
 
@@ -199,6 +199,17 @@ class IbToolPartition:
             self.dlg, "Select   output file ", "", '*.shp')
         self.dlg.output_file.setText(filename)
 
+    def select_HU_file(self):
+        """Öffnet einen Dateidialog, um die HU-Datei auszuwählen."""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self.dlg,  # Dialog ist Teil der GUI
+            "Select building footprints file",
+            "",
+            "Shapefiles (*.shp);;Alle Dateien (*)"
+        )
+        if file_path:
+            self.dlg.Input_HU.setText(file_path)  # Zeige den Pfad in QLineEdit an
+
     def siedgr(self, input_hu, cell_size, filename):
         feedback = QgsProcessingFeedback()
         feedback.pushInfo("Start partitioning")
@@ -354,6 +365,7 @@ class IbToolPartition:
         if self.first_start == True:
             self.first_start = False
             self.dlg = IbToolPartitionDialog()
+            self.dlg.HU_Button.clicked.connect(self.select_HU_file)
             self.dlg.Output_Button.clicked.connect(self.select_output_file)
 
         # show the dialog
@@ -363,6 +375,7 @@ class IbToolPartition:
         # See if OK was pressed
         if result:
             input_hu= self.dlg.Input_HU.text()
+            input_hu.dataProvider().createSpatialIndex()
             cell_size_text = self.dlg.cell_size.text()
             try:
                 cell_size = int(cell_size_text)  # Konvertiere den Text in eine Zahl
