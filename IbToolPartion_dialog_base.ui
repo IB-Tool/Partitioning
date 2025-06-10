@@ -39,7 +39,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>C:\Users\Oliver\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\ibtoolpartion\Test_data\A_HU.shp</string>
+    <string/>
    </property>
   </widget>
   <widget class="QSpinBox" name="cell_size">
@@ -123,7 +123,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>C:\Users\Oliver\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\ibtoolpartion\Test_data\Output.shp</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="Output_Button">
