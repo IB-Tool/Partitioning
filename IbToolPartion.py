@@ -199,16 +199,11 @@ class IbToolPartition:
             self.dlg, "Select   output file ", "", '*.shp')
         self.dlg.output_file.setText(filename)
 
-    def select_HU_file(self):
-        """Öffnet einen Dateidialog, um die HU-Datei auszuwählen."""
-        file_path, _ = QFileDialog.getOpenFileName(
-            self.dlg,  # Dialog ist Teil der GUI
-            "Select building footprints file",
-            "",
-            "Shapefiles (*.shp);;Alle Dateien (*)"
-        )
-        if file_path:
-            self.dlg.Input_HU.setText(file_path)  # Zeige den Pfad in QLineEdit an
+    def select_input_file(self):  # Petersen
+        filename, _filter = QFileDialog.getOpenFileName(
+            self.dlg, "Select input file ", "", '*.shp')
+        self.dlg.Input_HU.setText(filename)
+
 
     def siedgr(self, input_hu, cell_size, filename):
         feedback = QgsProcessingFeedback()
@@ -365,7 +360,7 @@ class IbToolPartition:
         if self.first_start == True:
             self.first_start = False
             self.dlg = IbToolPartitionDialog()
-            self.dlg.HU_Button.clicked.connect(self.select_HU_file)
+            self.dlg.HU_Button.clicked.connect(self.select_input_file)
             self.dlg.Output_Button.clicked.connect(self.select_output_file)
 
         # show the dialog
@@ -374,19 +369,43 @@ class IbToolPartition:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            input_hu= self.dlg.Input_HU.text()
-            input_hu.dataProvider().createSpatialIndex()
+            input_hu_path = self.dlg.Input_HU.text()
+            
+            # Validierung der Eingabedatei
+            if not input_hu_path or not os.path.exists(input_hu_path):
+                self.iface.messageBar().pushMessage(
+                    "Error", "Bitte wählen Sie eine gültige Eingabedatei aus.",
+                    level=Qgis.Critical, duration=5)
+                return
+            
+            # Erstelle QgsVectorLayer aus dem Pfad (falls nötig für Spatial Index)
+            input_layer = QgsVectorLayer(input_hu_path, "input_layer", "ogr")
+            if input_layer.isValid():
+                # Spatial Index erstellen falls gewünscht
+                input_layer.dataProvider().createSpatialIndex()
+            
             cell_size_text = self.dlg.cell_size.text()
             try:
                 cell_size = int(cell_size_text)  # Konvertiere den Text in eine Zahl
                 print(f"Eingegebener Wert als Zahl: {cell_size}")
             except ValueError:
-                print("Ungültiger Zahlenwert eingegeben.")
+                self.iface.messageBar().pushMessage(
+                    "Error", "Ungültiger Zahlenwert für Zellgröße eingegeben.",
+                    level=Qgis.Critical, duration=5)
+                return
 
             filename = self.dlg.output_file.text()
+            
+            # Validierung der Ausgabedatei
+            if not filename:
+                self.iface.messageBar().pushMessage(
+                    "Error", "Bitte wählen Sie eine Ausgabedatei aus.",
+                    level=Qgis.Critical, duration=5)
+                return
 
-            out_siedgr = self.siedgr(input_hu, cell_size, filename)
+            # Übergebe den Pfad an die siedgr Methode (nicht das Layer-Objekt)
+            out_siedgr = self.siedgr(input_hu_path, cell_size, filename)
 
-        self.iface.messageBar().pushMessage(
-          "Success", "Output file written at " + out_siedgr,
-          level=Qgis.Success, duration=3)
+            self.iface.messageBar().pushMessage(
+                "Success", "Output file written at " + out_siedgr,
+                level=Qgis.Success, duration=3)
