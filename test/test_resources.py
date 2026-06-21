@@ -1,4 +1,5 @@
 # coding=utf-8
+# pylint: skip-file
 """Resources test.
 
 .. note:: This program is free software; you can redistribute it and/or modify
@@ -13,21 +14,19 @@ __date__ = '2024-12-15'
 __copyright__ = 'Copyright 2024, Oliver Harig'
 
 import unittest
+import pytest
+pytest.importorskip("qgis.PyQt", reason="QGIS not available")
+from qgis.PyQt.QtGui import QIcon  # noqa: E402
 
-from qgis.PyQt.QtGui import QIcon
 
-
-
-class IbToolPartitionDialogTest(unittest.TestCase):
-    """Test rerources work."""
+class IbToolPartitionResourcesTest(unittest.TestCase):
+    """Test resources work."""
 
     def setUp(self):
         """Runs before each test."""
-        pass
 
     def tearDown(self):
         """Runs after each test."""
-        pass
 
     def test_icon_png(self):
         """Test we can click OK."""
@@ -35,10 +34,8 @@ class IbToolPartitionDialogTest(unittest.TestCase):
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 
+
 if __name__ == "__main__":
     suite = unittest.makeSuite(IbToolPartitionResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
-
-

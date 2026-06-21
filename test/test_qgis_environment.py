@@ -1,4 +1,5 @@
 # coding=utf-8
+# pylint: skip-file
 """Tests for QGIS functionality.
 
 
@@ -15,12 +16,14 @@ __copyright__ = ('Copyright 2012, Australia Indonesia Facility for '
 
 import os
 import unittest
-from qgis.core import (
+import pytest
+pytest.importorskip("qgis.core", reason="QGIS not available")
+from qgis.core import (  # noqa: E402
     QgsProviderRegistry,
     QgsCoordinateReferenceSystem,
     QgsRasterLayer)
 
-from .utilities import get_qgis_app
+from .utilities import get_qgis_app  # noqa: E402
 QGIS_APP = get_qgis_app()
 
 
@@ -49,12 +52,12 @@ class QGISTest(unittest.TestCase):
         expected_auth_id = 'EPSG:4326'
         self.assertEqual(auth_id, expected_auth_id)
 
-        # now test for a loaded layer
         path = os.path.join(os.path.dirname(__file__), 'tenbytenraster.asc')
         title = 'TestRaster'
         layer = QgsRasterLayer(path, title)
         auth_id = layer.crs().authid()
         self.assertEqual(auth_id, expected_auth_id)
+
 
 if __name__ == '__main__':
     unittest.main()

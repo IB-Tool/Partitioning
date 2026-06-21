@@ -1,4 +1,5 @@
 # coding=utf-8
+# pylint: skip-file
 """Dialog test.
 
 .. note:: This program is free software; you can redistribute it and/or modify
@@ -13,12 +14,13 @@ __date__ = '2024-12-15'
 __copyright__ = 'Copyright 2024, Oliver Harig'
 
 import unittest
+import pytest
+pytest.importorskip("qgis.PyQt", reason="QGIS not available")
+from qgis.PyQt.QtGui import QDialogButtonBox, QDialog  # noqa: E402
 
-from qgis.PyQt.QtGui import QDialogButtonBox, QDialog
+from IbToolPartion_dialog import IbToolPartitionDialog  # noqa: E402
 
-from IbToolPartion_dialog import IbToolPartitionDialog
-
-from utilities import get_qgis_app
+from utilities import get_qgis_app  # noqa: E402
 QGIS_APP = get_qgis_app()
 
 
@@ -48,8 +50,8 @@ class IbToolPartitionDialogTest(unittest.TestCase):
         result = self.dialog.result()
         self.assertEqual(result, QDialog.Rejected)
 
+
 if __name__ == "__main__":
     suite = unittest.makeSuite(IbToolPartitionDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
