@@ -22,7 +22,34 @@
       "Bash(docker --version)",
       "Bash(docker info *)",
       "Bash(gh issue *)",
-      "Bash(gh pr *)"
+      "Bash(gh pr *)",
+      "Bash(pyrcc5 resources.qrc -o resources.py)",
+      "Bash(.venv\\\\Scripts\\\\pytest.exe --tb=short)",
+      "PowerShell(Head *)",
+      "Skill(update-config)",
+      "Bash(pylint --version)",
+      "PowerShell(cd \"C:\\\\Users\\\\Oliver\\\\AppData\\\\Roaming\\\\QGIS\\\\QGIS3\\\\profiles\\\\default\\\\python\\\\plugins\\\\ibtoolpartion\"; $f=git diff --cached --name-only --diff-filter=ACM|Where-Object{$_ -match '\\\\.py$'}; if\\(!$f\\){ Write-Host 'Keine Python-Dateien staged - OK'; exit 0 }; Write-Host \"Gefunden: $f\")",
+      "PowerShell(git *)",
+      "PowerShell(cd \"C:\\\\Users\\\\Oliver\\\\AppData\\\\Roaming\\\\QGIS\\\\QGIS3\\\\profiles\\\\default\\\\python\\\\plugins\\\\ibtoolpartion\"; powershell.exe -ExecutionPolicy Bypass -File \".claude/pre_commit_checks.ps1\" 2>&1 | Select-Object -First 5)",
+      "PowerShell(pylint *)",
+      "PowerShell(cd \"C:\\\\Users\\\\Oliver\\\\AppData\\\\Roaming\\\\QGIS\\\\QGIS3\\\\profiles\\\\default\\\\python\\\\plugins\\\\ibtoolpartion\"; git diff --cached --name-only --diff-filter=ACM | Where-Object { $_ -match '\\\\.py$' })"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/pre_commit_checks.ps1",
+            "if": "Bash(git commit *)",
+            "shell": "powershell",
+            "timeout": 120,
+            "statusMessage": "Qualitätsprüfung: flake8 / pylint / bandit..."
+          }
+        ]
+      }
     ]
   }
 }

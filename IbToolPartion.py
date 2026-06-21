@@ -21,27 +21,20 @@
  *                                                                         *
  ***************************************************************************/
 """
+# pylint: disable=import-error
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QFileDialog
 from qgis.core import (
-    QgsProject,
     Qgis,
-    QgsApplication,
     QgsProcessingFeedback,
     QgsVectorLayer,
-    QgsRasterLayer,
-    QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource,
-    QgsProcessingParameterNumber,
-    QgsProcessingParameterFeatureSink,
-    QgsProcessingParameterFileDestination,
-    QgsProcessingUtils
+    QgsProcessingUtils,
 )
 from qgis import processing
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from .resources import *  # noqa: F401,F403  # pylint: disable=wildcard-import,unused-wildcard-import
 # Import the code for the dialog
 from .IbToolPartion_dialog import IbToolPartitionDialog
 import os.path
@@ -67,7 +60,7 @@ class IbToolPartition:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'IbToolPartition_{}.qm'.format(locale))
+            f'IbToolPartition_{locale}.qm')
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -76,7 +69,7 @@ class IbToolPartition:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&IB-Tool (Partitioning)')
+        self.menu = self.tr(u'&IB-Tool')
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -97,8 +90,7 @@ class IbToolPartition:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('IbToolPartition', message)
 
-
-    def add_action(
+    def add_action(  # pylint: disable=too-many-arguments
         self,
         icon_path,
         text,
@@ -108,7 +100,8 @@ class IbToolPartition:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -147,7 +140,6 @@ class IbToolPartition:
             added to self.actions list.
         :rtype: QAction
         """
-
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -174,47 +166,47 @@ class IbToolPartition:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
         icon_path = ':/plugins/IbToolPartion/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'IB-Tool (Partitioning)'),
+            text=self.tr(u'Partitioning'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
         # will be set False in run()
         self.first_start = True
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&IB-Tool (Partitioning)'),
+                self.tr(u'&IB-Tool'),
                 action)
             self.iface.removeToolBarIcon(action)
 
     def select_output_file(self):
+        """Open a save-file dialog and write the chosen path to the dialog."""
         if not hasattr(self, 'dlg') or self.dlg is None:
             return
-        
+
         filename, _filter = QFileDialog.getSaveFileName(
-            self.dlg, 
-            "Select output file", 
-            "", 
+            self.dlg,
+            "Select output file",
+            "",
             'Shapefiles (*.shp);;GeoPackage (*.gpkg);;All Files (*)'
         )
-        
+
         if filename:  # Nur setText wenn eine Datei ausgewählt wurde
             self.dlg.output_file.setText(filename)
 
-    def select_input_file(self):  # Petersen
+    def select_input_file(self):
+        """Open an open-file dialog and write the chosen path to the dialog."""
         filename, _filter = QFileDialog.getOpenFileName(
             self.dlg, "Select input file ", "", '*.shp, *.gpkg')
         self.dlg.Input_HU.setText(filename)
 
-
-    def siedgr(self, input_hu, cell_size, filename):
+    def siedgr(self, input_hu, cell_size, filename):  # pylint: disable=too-many-locals
+        """Run the partitioning algorithm and return the output path."""
         feedback = QgsProcessingFeedback()
         feedback.pushInfo("Start partitioning")
 
@@ -222,17 +214,19 @@ class IbToolPartition:
         radius = 2 * cell_size
 
         # Output-Dateien (temporär)
-        input_feature_point = QgsProcessingUtils.generateTempFilename("input_feature_point.gpkg")
+        input_feature_point = QgsProcessingUtils.generateTempFilename(
+            "input_feature_point.gpkg")
         hu_raster = QgsProcessingUtils.generateTempFilename("hu_raster.tif")
-        hu_raster_feature = QgsProcessingUtils.generateTempFilename("hu_raster_feature.gpkg")
+        hu_raster_feature = QgsProcessingUtils.generateTempFilename(
+            "hu_raster_feature.gpkg")
         thiess_poly = QgsProcessingUtils.generateTempFilename("thiess_poly.gpkg")
-        thiess_diss= QgsProcessingUtils.generateTempFilename("thiess_diss.gpkg")
-        thiess_diss_line = QgsProcessingUtils.generateTempFilename("thiess_diss_line.gpkg")
+        thiess_diss = QgsProcessingUtils.generateTempFilename("thiess_diss.gpkg")
+        thiess_diss_line = QgsProcessingUtils.generateTempFilename(
+            "thiess_diss_line.gpkg")
         thiess_line = QgsProcessingUtils.generateTempFilename("thiess_line.gpkg")
         thiess_split = QgsProcessingUtils.generateTempFilename("thiess_split.gpkg")
         merge = QgsProcessingUtils.generateTempFilename("merge.gpkg")
         poly_grenz = QgsProcessingUtils.generateTempFilename("poly_grenz.gpkg")
-
 
         # Feature-to-Point
         processing.run(
@@ -255,8 +249,7 @@ class IbToolPartition:
                         'KERNEL': 0,
                         'DECAY': 0,
                         'OUTPUT_VALUE': 0,
-                        'OUTPUT': hu_raster}
-                                )
+                        'OUTPUT': hu_raster})
 
         # Raster-to-Point
         processing.run("native:pixelstopoints", {
@@ -264,7 +257,7 @@ class IbToolPartition:
             'RASTER_BAND': 1,
             'FIELD_NAME': 'VALUE',
             'OUTPUT': hu_raster_feature},
-            feedback= feedback
+            feedback=feedback
         )
 
         # Thiessen-Polygone erstellen
@@ -303,7 +296,7 @@ class IbToolPartition:
                 'OUTPUT': thiess_split
             },
             feedback=feedback
-         )
+        )
 
         radius_del = cell_size // 2 + 10
 
@@ -311,7 +304,7 @@ class IbToolPartition:
         layer = QgsVectorLayer(thiess_split, "Split Lines", "ogr")
 
         if not layer.isEditable():
-                layer.startEditing()
+            layer.startEditing()
 
         # Features in einer bestimmten Entfernung auswählen und löschen
         processing.run(
@@ -321,7 +314,7 @@ class IbToolPartition:
                 'REFERENCE': hu_raster_feature,
                 'DISTANCE': radius_del,
                 'METHOD': 0
-             },
+            },
             feedback=feedback
         )
 
@@ -345,30 +338,28 @@ class IbToolPartition:
         # Linien zu Polygonen
         processing.run(
             "native:polygonize",
-            {   'INPUT': merge,
-                'KEEP_FIELDS': False,
-                'OUTPUT': poly_grenz
-            },
-            feedback = feedback
+            {'INPUT': merge,
+             'KEEP_FIELDS': False,
+             'OUTPUT': poly_grenz},
+            feedback=feedback
         )
 
         # Name-Feld hinzufügen
         processing.run("native:fieldcalculator", {
             'INPUT': poly_grenz,
-            'FIELD_NAME': 'NAME', 'FIELD_TYPE': 2, 'FIELD_LENGTH': 0, 'FIELD_PRECISION': 0, 'FORMULA': "'PART_' || $id",
+            'FIELD_NAME': 'NAME', 'FIELD_TYPE': 2, 'FIELD_LENGTH': 0,
+            'FIELD_PRECISION': 0, 'FORMULA': "'PART_' || $id",
             'OUTPUT': filename})
 
         return filename
 
-
     def run(self):
-        """Run method that performs all the real work"""
-
+        """Run method that performs all the real work."""
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start == True:
+        if self.first_start:
             self.first_start = False
-            self.dlg = IbToolPartitionDialog()
+            self.dlg = IbToolPartitionDialog()  # pylint: disable=attribute-defined-outside-init
             self.dlg.HU_Button.clicked.connect(self.select_input_file)
             self.dlg.Output_Button.clicked.connect(self.select_output_file)
 
@@ -379,20 +370,20 @@ class IbToolPartition:
         # See if OK was pressed
         if result:
             input_hu_path = self.dlg.Input_HU.text()
-            
+
             # Validierung der Eingabedatei
             if not input_hu_path or not os.path.exists(input_hu_path):
                 self.iface.messageBar().pushMessage(
                     "Error", "Bitte wählen Sie eine gültige Eingabedatei aus.",
                     level=Qgis.Critical, duration=5)
                 return
-            
+
             # Erstelle QgsVectorLayer aus dem Pfad (falls nötig für Spatial Index)
             input_layer = QgsVectorLayer(input_hu_path, "input_layer", "ogr")
             if input_layer.isValid():
                 # Spatial Index erstellen falls gewünscht
                 input_layer.dataProvider().createSpatialIndex()
-            
+
             cell_size_text = self.dlg.cell_size.text()
             try:
                 cell_size = int(cell_size_text)  # Konvertiere den Text in eine Zahl
@@ -404,7 +395,7 @@ class IbToolPartition:
                 return
 
             filename = self.dlg.output_file.text()
-            
+
             # Validierung der Ausgabedatei
             if not filename:
                 self.iface.messageBar().pushMessage(

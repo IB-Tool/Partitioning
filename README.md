@@ -75,20 +75,6 @@ Then activate the plugin in QGIS via **Plugins** → **Manage and Install Plugin
 
 ---
 
-## Test data
-
-Sample data is provided in `Test_data/`:
-
-| File | Description |
-|------|-------------|
-| `A_HU.*` | Sample building footprints |
-| `A_AUX.*` | Auxiliary area features |
-| `A_PART.*` | Reference partition output |
-| `A_RN.*` | Road network |
-| `UGB.*` | Urban growth boundary |
-
----
-
 ## Development
 
 ### Setup
