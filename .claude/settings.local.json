@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout *)",
+      "Bash(git *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(pytest test/ *)",
+      "Bash(pytest test/test_*.py *)",
+      "Bash(python -m pytest *)",
+      "Bash(python -m py_compile *)",
+      "Bash(python -m pylint *)",
+      "Bash(flake8 .)",
+      "Bash(flake8 *)",
+      "Bash(bandit -r . -ll)",
+      "Bash(bandit *)",
+      "Bash(python ci/qgis_plugin_validate.py *)",
+      "Bash(docker build *)",
+      "Bash(docker run *)",
+      "Bash(docker --version)",
+      "Bash(docker info *)",
+      "Bash(gh issue *)",
+      "Bash(gh pr *)"
+    ]
+  }
+}
