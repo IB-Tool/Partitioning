@@ -195,13 +195,22 @@ class IbToolPartition:
             self.iface.removeToolBarIcon(action)
 
     def select_output_file(self):
+        if not hasattr(self, 'dlg') or self.dlg is None:
+            return
+        
         filename, _filter = QFileDialog.getSaveFileName(
-            self.dlg, "Select   output file ", "", '*.shp')
-        self.dlg.output_file.setText(filename)
+            self.dlg, 
+            "Select output file", 
+            "", 
+            'Shapefiles (*.shp);;GeoPackage (*.gpkg);;All Files (*)'
+        )
+        
+        if filename:  # Nur setText wenn eine Datei ausgewählt wurde
+            self.dlg.output_file.setText(filename)
 
     def select_input_file(self):  # Petersen
         filename, _filter = QFileDialog.getOpenFileName(
-            self.dlg, "Select input file ", "", '*.shp')
+            self.dlg, "Select input file ", "", '*.shp, *.gpkg')
         self.dlg.Input_HU.setText(filename)
 
 
