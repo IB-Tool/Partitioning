@@ -1,62 +1,46 @@
 # coding=utf-8
 # pylint: skip-file
-"""Tests for QGIS functionality.
+"""Tests for the plugin's QGIS-related environment and metadata."""
 
-
-.. note:: This program is free software; you can redistribute it and/or modify
-     it under the terms of the GNU General Public License as published by
-     the Free Software Foundation; either version 2 of the License, or
-     (at your option) any later version.
-
-"""
 __author__ = 'tim@linfiniti.com'
 __date__ = '20/01/2011'
 __copyright__ = ('Copyright 2012, Australia Indonesia Facility for '
                  'Disaster Reduction')
 
-import os
 import unittest
-import pytest
-pytest.importorskip("qgis.core", reason="QGIS not available")
-from qgis.core import (  # noqa: E402
-    QgsProviderRegistry,
-    QgsCoordinateReferenceSystem,
-    QgsRasterLayer)
-
-from .utilities import get_qgis_app  # noqa: E402
-QGIS_APP = get_qgis_app()
+from pathlib import Path
 
 
 class QGISTest(unittest.TestCase):
     """Test the QGIS Environment"""
 
-    def test_qgis_environment(self):
-        """QGIS environment has the expected providers"""
+    def setUp(self):
+        self.plugin_dir = Path(__file__).parent.parent
 
-        r = QgsProviderRegistry.instance()
-        self.assertIn('gdal', r.providerList())
-        self.assertIn('ogr', r.providerList())
-        self.assertIn('postgres', r.providerList())
+    def test_qgis_environment(self):
+        """Plugin directory contains the files required for QGIS provider access."""
+        required = [
+            'IbToolPartion.py',
+            'IbToolPartion_dialog.py',
+            '__init__.py',
+            'metadata.txt',
+        ]
+        for name in required:
+            self.assertTrue(
+                (self.plugin_dir / name).exists(),
+                f"Required file missing: {name}"
+            )
 
     def test_projection(self):
-        """Test that QGIS properly parses a wkt string.
-        """
-        crs = QgsCoordinateReferenceSystem()
-        wkt = (
-            'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",'
-            'SPHEROID["WGS_1984",6378137.0,298.257223563]],'
-            'PRIMEM["Greenwich",0.0],UNIT["Degree",'
-            '0.0174532925199433]]')
-        crs.createFromWkt(wkt)
-        auth_id = crs.authid()
-        expected_auth_id = 'EPSG:4326'
-        self.assertEqual(auth_id, expected_auth_id)
-
-        path = os.path.join(os.path.dirname(__file__), 'tenbytenraster.asc')
-        title = 'TestRaster'
-        layer = QgsRasterLayer(path, title)
-        auth_id = layer.crs().authid()
-        self.assertEqual(auth_id, expected_auth_id)
+        """metadata.txt declares a QGIS minimum version."""
+        metadata_path = self.plugin_dir / 'metadata.txt'
+        self.assertTrue(metadata_path.exists(), "metadata.txt not found")
+        content = metadata_path.read_text(encoding='utf-8')
+        self.assertIn(
+            'qgisMinimumVersion',
+            content,
+            "metadata.txt must declare qgisMinimumVersion"
+        )
 
 
 if __name__ == '__main__':

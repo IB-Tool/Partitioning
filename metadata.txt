@@ -9,11 +9,10 @@ description=This tool generates a partition of the dataset based on building foo
 version=0.1
 author=Oliver Harig
 email=ottmar.hittzfeld@web.de
+license=CC BY 2.0
 
 about=This tool generates a partition of the dataset based on building footprints.
 
-tracker=http://bugs
-repository=http://repo
 # End of mandatory metadata
 
 # Recommended items:

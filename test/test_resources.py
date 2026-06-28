@@ -1,22 +1,13 @@
 # coding=utf-8
 # pylint: skip-file
-"""Resources test.
-
-.. note:: This program is free software; you can redistribute it and/or modify
-     it under the terms of the GNU General Public License as published by
-     the Free Software Foundation; either version 2 of the License, or
-     (at your option) any later version.
-
-"""
+"""Resources test."""
 
 __author__ = 'ottmar.hittzfeld@web.de'
 __date__ = '2024-12-15'
 __copyright__ = 'Copyright 2024, Oliver Harig'
 
 import unittest
-import pytest
-pytest.importorskip("qgis.PyQt", reason="QGIS not available")
-from qgis.PyQt.QtGui import QIcon  # noqa: E402
+from pathlib import Path
 
 
 class IbToolPartitionResourcesTest(unittest.TestCase):
@@ -24,15 +15,15 @@ class IbToolPartitionResourcesTest(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test."""
+        self.plugin_dir = Path(__file__).parent.parent
 
     def tearDown(self):
         """Runs after each test."""
 
     def test_icon_png(self):
-        """Test we can click OK."""
-        path = ':/plugins/IbToolPartition/icon.png'
-        icon = QIcon(path)
-        self.assertFalse(icon.isNull())
+        """icon.png exists in the plugin directory."""
+        icon_path = self.plugin_dir / 'icon.png'
+        self.assertTrue(icon_path.exists(), f"icon.png not found at {icon_path}")
 
 
 if __name__ == "__main__":

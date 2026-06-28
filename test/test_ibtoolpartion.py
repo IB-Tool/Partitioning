@@ -303,11 +303,34 @@ class TestIbToolPartitionSiedgr:
         assert result == "output.shp"
 
     @pytest.mark.integration
-    @pytest.mark.skip(reason="Requires Docker/QGIS environment with Processing framework")
     def test_siedgr_output_has_features(self, plugin):
-        """siedgr() writes a non-empty output layer for a real polygon input."""
+        """siedgr() runs all 12 processing steps and threads the output path to the final step."""
+        processing = sys.modules["qgis"].processing
+        processing.run.reset_mock()
+
+        plugin.siedgr("input.shp", 100, "output.shp")
+
+        assert processing.run.call_count == 12, (
+            f"Expected 12 processing.run calls, got {processing.run.call_count}"
+        )
+        # The last call must use the requested output path.
+        last_call = processing.run.call_args_list[-1]
+        assert last_call.args[1]['OUTPUT'] == "output.shp"
 
     @pytest.mark.integration
-    @pytest.mark.skip(reason="Requires Docker/QGIS environment with Processing framework")
     def test_siedgr_output_contains_name_field(self, plugin):
-        """siedgr() output layer contains a NAME field with PART_<id> values."""
+        """siedgr() passes FIELD_NAME='NAME' and FORMULA=\"'PART_' || $id\" to fieldcalculator."""
+        processing = sys.modules["qgis"].processing
+        processing.run.reset_mock()
+
+        plugin.siedgr("input.shp", 100, "output.shp")
+
+        fieldcalc_calls = [
+            c for c in processing.run.call_args_list
+            if c.args[0] == "native:fieldcalculator"
+        ]
+        assert len(fieldcalc_calls) == 1, "Exactly one fieldcalculator call expected"
+        params = fieldcalc_calls[0].args[1]
+        assert params['FIELD_NAME'] == 'NAME'
+        assert "'PART_' || $id" in params['FORMULA']
+        assert params['OUTPUT'] == "output.shp"
