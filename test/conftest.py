@@ -2,13 +2,12 @@
 """
 Pytest configuration and fixtures for IbToolPartition plugin tests.
 """
-import pytest
 import tempfile
 import shutil
-import sys
-import os
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 @pytest.fixture
@@ -42,7 +41,6 @@ def mock_qgis_interface():
     mock_iface.addPluginToMenu = MagicMock()
     mock_iface.removePluginMenu = MagicMock()
     mock_iface.mainWindow.return_value = MagicMock()
-    
     return mock_iface
 
 
@@ -59,18 +57,16 @@ def mock_qgis_modules():
     """
     Fixture that provides mocked QGIS modules.
     """
-    from unittest.mock import patch, MagicMock
-    
     qgis_mocks = {
         'qgis': MagicMock(),
         'qgis.PyQt': MagicMock(),
         'qgis.PyQt.QtCore': MagicMock(),
-        'qgis.PyQt.QtGui': MagicMock(), 
+        'qgis.PyQt.QtGui': MagicMock(),
         'qgis.PyQt.QtWidgets': MagicMock(),
         'qgis.core': MagicMock(),
         'qgis.gui': MagicMock(),
         'qgis.processing': MagicMock(),
     }
-    
+
     with patch.dict('sys.modules', qgis_mocks):
         yield qgis_mocks

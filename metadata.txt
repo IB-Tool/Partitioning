@@ -9,11 +9,10 @@ description=This tool generates a partition of the dataset based on building foo
 version=0.1
 author=Oliver Harig
 email=ottmar.hittzfeld@web.de
+license=CC BY 2.0
 
 about=This tool generates a partition of the dataset based on building footprints.
 
-tracker=http://bugs
-repository=http://repo
 # End of mandatory metadata
 
 # Recommended items:
@@ -25,7 +24,9 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=http://homepage
+homepage=https://github.com/K3lT10N/IB-Tool_3_Partitionierung
+tracker=https://github.com/K3lT10N/IB-Tool_3_Partitionierung/issues
+repository=https://github.com/K3lT10N/IB-Tool_3_Partitionierung
 category=Plugins
 icon=icon.png
 # experimental flag

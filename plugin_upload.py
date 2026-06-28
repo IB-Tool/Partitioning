@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+# pylint: skip-file
 """This script uploads a plugin package to the plugin repository.
         Authors: A. Pasotti, V. Picavet
         git sha              : $TemplateVCSFormat
@@ -7,10 +8,8 @@
 
 import sys
 import getpass
-import xmlrpc.client
+import xmlrpc.client  # nosec B411
 from optparse import OptionParser
-
-standard_library.install_aliases()
 
 # Configuration
 PROTOCOL = 'https'

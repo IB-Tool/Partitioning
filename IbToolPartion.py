@@ -33,9 +33,7 @@ from qgis.core import (
 )
 from qgis import processing
 
-# Initialize Qt resources from file resources.py
 from .resources import *  # noqa: F401,F403  # pylint: disable=wildcard-import,unused-wildcard-import
-# Import the code for the dialog
 from .IbToolPartion_dialog import IbToolPartitionDialog
 import os.path
 
@@ -51,11 +49,8 @@ class IbToolPartition:
             application at run time.
         :type iface: QgsInterface
         """
-        # Save reference to the QGIS interface
         self.iface = iface
-        # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
-        # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
             self.plugin_dir,
@@ -67,7 +62,6 @@ class IbToolPartition:
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
 
-        # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&IB-Tool')
 
@@ -152,7 +146,6 @@ class IbToolPartition:
             action.setWhatsThis(whats_this)
 
         if add_to_toolbar:
-            # Adds plugin icon to Plugins toolbar
             self.iface.addToolBarIcon(action)
 
         if add_to_menu:
@@ -196,7 +189,7 @@ class IbToolPartition:
             'Shapefiles (*.shp);;GeoPackage (*.gpkg);;All Files (*)'
         )
 
-        if filename:  # Nur setText wenn eine Datei ausgewählt wurde
+        if filename:
             self.dlg.output_file.setText(filename)
 
     def select_input_file(self):
@@ -208,12 +201,10 @@ class IbToolPartition:
     def siedgr(self, input_hu, cell_size, filename):  # pylint: disable=too-many-locals
         """Run the partitioning algorithm and return the output path."""
         feedback = QgsProcessingFeedback()
-        feedback.pushInfo("Start partitioning")
+        feedback.pushInfo(self.tr("Start partitioning"))
 
-        # Variablen
         radius = 2 * cell_size
 
-        # Output-Dateien (temporär)
         input_feature_point = QgsProcessingUtils.generateTempFilename(
             "input_feature_point.gpkg")
         hu_raster = QgsProcessingUtils.generateTempFilename("hu_raster.tif")
@@ -228,7 +219,6 @@ class IbToolPartition:
         merge = QgsProcessingUtils.generateTempFilename("merge.gpkg")
         poly_grenz = QgsProcessingUtils.generateTempFilename("poly_grenz.gpkg")
 
-        # Feature-to-Point
         processing.run(
             "native:centroids",
             {
@@ -239,7 +229,6 @@ class IbToolPartition:
             feedback=feedback
         )
 
-        # Punktdichte erstellen
         processing.run("qgis:heatmapkerneldensityestimation",
                        {'INPUT': input_feature_point,
                         'RADIUS': radius,
@@ -251,7 +240,6 @@ class IbToolPartition:
                         'OUTPUT_VALUE': 0,
                         'OUTPUT': hu_raster})
 
-        # Raster-to-Point
         processing.run("native:pixelstopoints", {
             'INPUT_RASTER': hu_raster,
             'RASTER_BAND': 1,
@@ -260,7 +248,6 @@ class IbToolPartition:
             feedback=feedback
         )
 
-        # Thiessen-Polygone erstellen
         processing.run(
             "native:voronoipolygons",
             {
@@ -278,7 +265,6 @@ class IbToolPartition:
             'INPUT': thiess_diss,
             'OUTPUT': thiess_diss_line})
 
-        # Polygone zu Linien
         processing.run(
             "native:polygonstolines",
             {
@@ -288,7 +274,6 @@ class IbToolPartition:
             feedback=feedback
         )
 
-        # Linien teilen
         processing.run(
             "native:explodelines",
             {
@@ -300,13 +285,11 @@ class IbToolPartition:
 
         radius_del = cell_size // 2 + 10
 
-        # Layer laden
         layer = QgsVectorLayer(thiess_split, "Split Lines", "ogr")
 
         if not layer.isEditable():
             layer.startEditing()
 
-        # Features in einer bestimmten Entfernung auswählen und löschen
         processing.run(
             "native:selectwithindistance",
             {
@@ -318,24 +301,20 @@ class IbToolPartition:
             feedback=feedback
         )
 
-        # IDs der ausgewählten Features holen
         feature_ids = [feature.id() for feature in layer.selectedFeatures()]
 
         if feature_ids:
-            # Ausgewählte Features löschen
             layer.deleteFeatures(feature_ids)
-            feedback.pushInfo(f"{len(feature_ids)} Feature(s) wurden gelöscht.")
+            feedback.pushInfo(self.tr("{} feature(s) deleted.").format(len(feature_ids)))
         else:
-            feedback.pushInfo("Keine Features zur Löschung ausgewählt.")
+            feedback.pushInfo(self.tr("No features selected for deletion."))
 
-        # Änderungen speichern
         layer.commitChanges()
 
         processing.run("native:mergevectorlayers",
                        {'LAYERS': [layer, thiess_diss_line], 'CRS': None,
                         'OUTPUT': merge})
 
-        # Linien zu Polygonen
         processing.run(
             "native:polygonize",
             {'INPUT': merge,
@@ -344,7 +323,6 @@ class IbToolPartition:
             feedback=feedback
         )
 
-        # Name-Feld hinzufügen
         processing.run("native:fieldcalculator", {
             'INPUT': poly_grenz,
             'FIELD_NAME': 'NAME', 'FIELD_TYPE': 2, 'FIELD_LENGTH': 0,
@@ -355,57 +333,47 @@ class IbToolPartition:
 
     def run(self):
         """Run method that performs all the real work."""
-        # Create the dialog with elements (after translation) and keep reference
-        # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         if self.first_start:
             self.first_start = False
             self.dlg = IbToolPartitionDialog()  # pylint: disable=attribute-defined-outside-init
             self.dlg.HU_Button.clicked.connect(self.select_input_file)
             self.dlg.Output_Button.clicked.connect(self.select_output_file)
 
-        # show the dialog
         self.dlg.show()
-        # Run the dialog event loop
         result = self.dlg.exec_()
-        # See if OK was pressed
         if result:
             input_hu_path = self.dlg.Input_HU.text()
 
-            # Validierung der Eingabedatei
             if not input_hu_path or not os.path.exists(input_hu_path):
                 self.iface.messageBar().pushMessage(
-                    "Error", "Bitte wählen Sie eine gültige Eingabedatei aus.",
+                    self.tr("Error"), self.tr("Please select a valid input file."),
                     level=Qgis.Critical, duration=5)
                 return
 
-            # Erstelle QgsVectorLayer aus dem Pfad (falls nötig für Spatial Index)
             input_layer = QgsVectorLayer(input_hu_path, "input_layer", "ogr")
             if input_layer.isValid():
-                # Spatial Index erstellen falls gewünscht
                 input_layer.dataProvider().createSpatialIndex()
 
             cell_size_text = self.dlg.cell_size.text()
             try:
-                cell_size = int(cell_size_text)  # Konvertiere den Text in eine Zahl
-                print(f"Eingegebener Wert als Zahl: {cell_size}")
+                cell_size = int(cell_size_text)
+                print(f"Cell size value: {cell_size}")
             except ValueError:
                 self.iface.messageBar().pushMessage(
-                    "Error", "Ungültiger Zahlenwert für Zellgröße eingegeben.",
+                    self.tr("Error"), self.tr("Invalid numeric value for cell size."),
                     level=Qgis.Critical, duration=5)
                 return
 
             filename = self.dlg.output_file.text()
 
-            # Validierung der Ausgabedatei
             if not filename:
                 self.iface.messageBar().pushMessage(
-                    "Error", "Bitte wählen Sie eine Ausgabedatei aus.",
+                    self.tr("Error"), self.tr("Please select an output file."),
                     level=Qgis.Critical, duration=5)
                 return
 
-            # Übergebe den Pfad an die siedgr Methode (nicht das Layer-Objekt)
             out_siedgr = self.siedgr(input_hu_path, cell_size, filename)
 
             self.iface.messageBar().pushMessage(
-                "Success", "Output file written at " + out_siedgr,
+                self.tr("Success"), self.tr("Output file written at {}").format(out_siedgr),
                 level=Qgis.Success, duration=3)
