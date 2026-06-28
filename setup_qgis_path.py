@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+# pylint: skip-file
 """
 Setup script to add QGIS paths to Python environment for testing.
 """
 import sys
 import os
-from pathlib import Path
 
 
 def setup_qgis_paths():
@@ -123,7 +123,7 @@ def test_qgis_import():
 
     # Test 1: Basic Qt import
     try:
-        from PyQt5.QtCore import QCoreApplication
+        from PyQt5.QtCore import QCoreApplication  # noqa: F401
         print("✓ PyQt5.QtCore erfolgreich importiert")
     except ImportError as e:
         print(f"✗ PyQt5.QtCore Import fehlgeschlagen: {e}")
@@ -131,7 +131,7 @@ def test_qgis_import():
 
     # Test 2: QGIS PyQt import
     try:
-        from qgis.PyQt.QtCore import QCoreApplication as QgsQtCore
+        from qgis.PyQt.QtCore import QCoreApplication as QgsQtCore  # noqa: F401
         print("✓ qgis.PyQt.QtCore erfolgreich importiert")
     except ImportError as e:
         print(f"✗ qgis.PyQt.QtCore Import fehlgeschlagen: {e}")
@@ -139,7 +139,7 @@ def test_qgis_import():
 
     # Test 3: QGIS core import
     try:
-        from qgis.core import QgsApplication
+        from qgis.core import QgsApplication  # noqa: F401
         print("✓ qgis.core.QgsApplication erfolgreich importiert")
     except ImportError as e:
         print(f"✗ qgis.core Import fehlgeschlagen: {e}")
@@ -147,7 +147,7 @@ def test_qgis_import():
 
     # Test 4: Full qgis.core import
     try:
-        import qgis.core
+        import qgis.core  # noqa: F401
         print("✓ qgis.core vollständig importiert")
         return True
     except ImportError as e:
