@@ -12,11 +12,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import configparser
-import io
-import os
 import re
-import sys
 import zipfile
 from pathlib import Path
 
@@ -45,22 +41,23 @@ REQUIRED_METADATA_KEYS = [
 
 
 def fail(msg: str) -> None:
+    """Print a FAIL message and exit with code 2."""
     print(f"FAIL: {msg}")
     raise SystemExit(2)
 
 
 def warn(msg: str) -> None:
+    """Print a WARN message."""
     print(f"WARN: {msg}")
 
 
 def ok(msg: str) -> None:
+    """Print an OK message."""
     print(f"OK: {msg}")
 
 
 def parse_metadata_text(text: str) -> dict[str, str]:
-    # metadata.txt uses INI-like format, but often without sections.
-    # QGIS accepts it as a simple key=value file.
-    # We'll parse with a fallback approach.
+    """Parse a QGIS metadata.txt (key=value, ignoring comments and blank lines)."""
     data: dict[str, str] = {}
     for raw in text.splitlines():
         line = raw.strip()
@@ -74,6 +71,7 @@ def parse_metadata_text(text: str) -> dict[str, str]:
 
 
 def validate_plugin_dir(plugin_dir: Path) -> None:
+    """Validate a plugin directory against structure and metadata requirements."""
     if not plugin_dir.exists() or not plugin_dir.is_dir():
         fail(f"plugin-dir not found or not a directory: {plugin_dir}")
 
@@ -88,9 +86,17 @@ def validate_plugin_dir(plugin_dir: Path) -> None:
             fail(f"missing required file: {p}")
     ok("required files present")
 
-    # LICENSE filename exact check already by existence.
-    if (plugin_dir / "LICENSE").exists() or (plugin_dir / "license").exists():
-        warn("found LICENSE-like files; repository expects file named exactly 'LICENSE' (no extension).")
+    # Warn if LICENSE files with extensions exist instead of the exact name 'LICENSE'.
+    license_with_ext = [
+        p for p in plugin_dir.iterdir()
+        if p.stem.upper() == "LICENSE" and p.suffix
+    ]
+    if license_with_ext:
+        names = [p.name for p in license_with_ext]
+        warn(
+            f"found LICENSE files with extensions {names}; "
+            "repository expects file named exactly 'LICENSE' (no extension)."
+        )
 
     meta_path = plugin_dir / "metadata.txt"
     meta_text = meta_path.read_text(encoding="utf-8", errors="replace")
@@ -101,18 +107,15 @@ def validate_plugin_dir(plugin_dir: Path) -> None:
         fail(f"metadata.txt missing/empty keys: {', '.join(missing)}")
     ok("metadata.txt required keys present")
 
-    # Basic URL sanity checks (not strict)
     for k in ("homepage", "tracker", "repository"):
         v = meta.get(k, "")
         if v and not (v.startswith("http://") or v.startswith("https://")):
             warn(f"metadata key '{k}' does not look like a URL: {v}")
 
-    # Version sanity
     version = meta.get("version", "")
     if version and not re.match(r"^[0-9A-Za-z.\-_+]+$", version):
         warn(f"version contains unusual characters: {version}")
 
-    # Optional but useful
     if "icon" not in meta:
         warn("metadata.txt has no 'icon' key (best practice).")
     if len(meta.get("description", "")) < 10:
@@ -120,6 +123,7 @@ def validate_plugin_dir(plugin_dir: Path) -> None:
 
 
 def validate_zip(zip_path: Path) -> None:
+    """Validate a plugin release zip for structure and metadata requirements."""
     if not zip_path.exists():
         fail(f"zip not found: {zip_path}")
     if zip_path.suffix.lower() != ".zip":
@@ -129,7 +133,10 @@ def validate_zip(zip_path: Path) -> None:
         names = [n for n in z.namelist() if not n.endswith("/")]
         top_levels = set(n.split("/", 1)[0] for n in names if "/" in n)
         if len(top_levels) != 1:
-            fail(f"zip must contain exactly one top-level plugin folder. Found: {sorted(top_levels)}")
+            fail(
+                f"zip must contain exactly one top-level plugin folder. "
+                f"Found: {sorted(top_levels)}"
+            )
 
         plugin_folder = next(iter(top_levels))
         if not FOLDER_RE.match(plugin_folder):
@@ -138,6 +145,7 @@ def validate_zip(zip_path: Path) -> None:
         ok(f"zip top-level folder: {plugin_folder}")
 
         def has(path: str) -> bool:
+            """Return True if path exists among zip entries."""
             return path in names
 
         for fname in REQUIRED_FILES:
@@ -146,7 +154,6 @@ def validate_zip(zip_path: Path) -> None:
                 fail(f"missing required file in zip: {inner}")
         ok("required files present in zip")
 
-        # Read metadata.txt
         meta_bytes = z.read(f"{plugin_folder}/metadata.txt")
         meta_text = meta_bytes.decode("utf-8", errors="replace")
         meta = parse_metadata_text(meta_text)
@@ -156,37 +163,44 @@ def validate_zip(zip_path: Path) -> None:
             fail(f"metadata.txt missing/empty keys: {', '.join(missing)}")
         ok("metadata.txt required keys present (zip)")
 
-        # Warn on suspicious filetypes (very simple heuristic)
         suspicious_ext = {".exe", ".dll", ".so", ".dylib"}
         found_susp = [n for n in names if Path(n).suffix.lower() in suspicious_ext]
         if found_susp:
-            warn(f"zip contains binary-looking files: {found_susp[:10]}{'...' if len(found_susp)>10 else ''}")
+            tail = "..." if len(found_susp) > 10 else ""
+            warn(f"zip contains binary-looking files: {found_susp[:10]}{tail}")
 
 
 def auto_detect_plugin_dir(repo_root: Path) -> Path | None:
-    # Look for a directory that contains metadata.txt at depth <= 3, excluding common dirs
+    """Search repo_root for a QGIS plugin directory (contains metadata.txt + __init__.py)."""
     skip = {".git", ".github", "__pycache__", "venv", ".venv", "dist", "build"}
     for p in repo_root.rglob("metadata.txt"):
         try:
             rel = p.relative_to(repo_root)
         except ValueError:
             continue
-        parts = rel.parts
-        if any(part in skip for part in parts):
+        if any(part in skip for part in rel.parts):
             continue
-        # plugin folder is parent of metadata.txt
         plugin_dir = p.parent
-        # avoid nested metadata in docs
         if plugin_dir.is_dir() and (plugin_dir / "__init__.py").exists():
             return plugin_dir
     return None
 
 
 def main() -> None:
+    """Entry point: parse arguments and run the appropriate validator."""
     ap = argparse.ArgumentParser()
-    ap.add_argument("--plugin-dir", type=Path, default=None, help="Path to the plugin folder (contains metadata.txt)")
-    ap.add_argument("--zip", type=Path, nargs="+", default=None, help="Path(s) to release zip(s)")
-    ap.add_argument("--auto", action="store_true", help="Auto-detect plugin dir in repository (default if none provided)")
+    ap.add_argument(
+        "--plugin-dir", type=Path, default=None,
+        help="Path to the plugin folder (contains metadata.txt)"
+    )
+    ap.add_argument(
+        "--zip", type=Path, nargs="+", default=None,
+        help="Path(s) to release zip(s)"
+    )
+    ap.add_argument(
+        "--auto", action="store_true",
+        help="Auto-detect plugin dir in repository (default if none provided)"
+    )
     args = ap.parse_args()
 
     if args.zip:

@@ -24,7 +24,9 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=http://homepage
+homepage=https://github.com/K3lT10N/IB-Tool_3_Partitionierung
+tracker=https://github.com/K3lT10N/IB-Tool_3_Partitionierung/issues
+repository=https://github.com/K3lT10N/IB-Tool_3_Partitionierung
 category=Plugins
 icon=icon.png
 # experimental flag
