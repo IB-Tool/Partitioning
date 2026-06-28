@@ -34,7 +34,7 @@ jobs:
 
       - name: Bandit (security)
         run: |
-          bandit -r . -ll
+          bandit -r . -ll --skip B101
 
       - name: detect-secrets (secrets)
         run: |
