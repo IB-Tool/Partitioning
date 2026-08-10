@@ -33,3 +33,14 @@ ENV QGIS_PLUGINPATH=/usr/share/qgis/python/plugins
 # Arbeitsverzeichnis für die Testausführung
 WORKDIR /plugins/ibtoolpartion
 
+# 7. Testsuite mit Coverage beim Containerstart ausführen.
+#    coverage.xml wird ins WORKDIR geschrieben, das per Volume-Mount ($(pwd))
+#    auf den Host abgebildet ist, damit der CI-Schritt die Datei danach lesen kann.
+#    xvfb-run stellt einen virtuellen X-Server bereit, falls QGIS trotz
+#    QT_QPA_PLATFORM=offscreen intern einen Display benötigt.
+CMD ["xvfb-run", "-a", "python3", "-m", "pytest", \
+     "--cov=.", \
+     "--cov-report=xml:coverage.xml", \
+     "--cov-report=term-missing", \
+     "--tb=short"]
+
