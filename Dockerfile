@@ -1,16 +1,35 @@
-FROM python:3.11-slim
+# 1. Basis-Image mit QGIS 3.40
+FROM 3liz/qgis-platform:3.40
 
-# Install test dependencies at build time; source code is mounted at runtime.
-COPY requirements-test.txt /tmp/requirements-test.txt
-RUN pip install --no-cache-dir -r /tmp/requirements-test.txt
+# 2. Root-Rechte für Systeminstallationen
+USER root
 
+# 3. System-Updates, Headless-X-Server und Test-Abhängigkeiten installieren.
+#    Diese Plugin hat keine Runtime-Abhängigkeiten außerhalb der QGIS-eigenen
+#    Prozessierungs-Algorithmen (siehe requirements-test.txt für Test-Deps).
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    xvfb \
+    python3-pytest \
+    python3-pytest-cov \
+    python3-coverage \
+    python3-pip \
+ && rm -rf /var/lib/apt/lists/*
+
+# 4. Arbeitsverzeichnis im Container
+WORKDIR /plugins
+
+# 5. Plugin-Code kopieren. Der Ordnername ist bereits ein gültiger
+#    Python-Bezeichner, daher ist (anders als bei IB-Tool-3) kein
+#    virtuelles Package-Alias nötig.
+COPY . /plugins/ibtoolpartion/
+
+# 6. Umgebungsvariablen für headless mode und Processing setzen
+ENV QT_QPA_PLATFORM=offscreen
+ENV QGIS_PREFIX_PATH=/usr
+ENV PYTHONPATH=/plugins:/usr/share/qgis/python:/usr/share/qgis/python/plugins
+ENV QGIS_PLUGINPATH=/usr/share/qgis/python/plugins
+
+# Arbeitsverzeichnis für die Testausführung
 WORKDIR /plugins/ibtoolpartion
 
-# Run the full test suite with coverage when the container starts.
-# coverage.xml is written to WORKDIR, which maps to the host volume mount
-# ($(pwd)) so the CI step can read it after the container exits.
-CMD ["python", "-m", "pytest", \
-     "--cov=.", \
-     "--cov-report=xml:coverage.xml", \
-     "--cov-report=term-missing", \
-     "--tb=short"]

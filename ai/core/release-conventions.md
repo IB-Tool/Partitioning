@@ -1,7 +1,11 @@
-# Release Conventions — IBTool
+# Release Conventions — IB-Tool (Partitioning)
 
 These rules are binding for all code changes. They are referenced from
 `CLAUDE.md` and `ai/core/constraints.md`.
+
+Mirrors IBTool's own `ai/core/release-conventions.md` (the canonical version,
+see [IB-Tool-3](https://github.com/IB-Tool/IB-Tool-3/blob/master/ai/core/release-conventions.md)),
+adapted for this plugin's folder name and repository.
 
 ---
 
@@ -35,10 +39,10 @@ These rules are binding for all code changes. They are referenced from
 
 ## Plugin Folder Name
 
-- The repository root folder is `IB-Tool-3` (contains a hyphen)
-- QGIS resolves this via `importlib.import_module`; the `__init__.py` registers
-  a virtual `ibtool` package as a workaround
-- The ZIP must contain exactly one top-level folder named `IB-Tool-3`
+- The repository root folder is `ibtoolpartion` — already a valid Python
+  identifier (no hyphens, no leading digit), so unlike `IB-Tool-3` no rename
+  or virtual-package alias is required for QGIS to load it.
+- The ZIP must contain exactly one top-level folder named `ibtoolpartion`
 - Do not rename the folder or the ZIP without updating `scripts/create_release_zip.py`
 
 ## CI Requirements

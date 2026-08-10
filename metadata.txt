@@ -9,25 +9,24 @@ description=This tool generates a partition of the dataset based on building foo
 version=0.1
 author=Oliver Harig
 email=ottmar.hittzfeld@web.de
-license=CC BY 2.0
 
 about=This tool generates a partition of the dataset based on building footprints.
 
+tracker=https://github.com/IB-Tool/ibtoolpartion/issues
+repository=https://github.com/IB-Tool/ibtoolpartion
+license=GPL-2.0-or-later
 # End of mandatory metadata
 
 # Recommended items:
 
 hasProcessingProvider=no
-# Uncomment the following line and add your changelog:
-# changelog=
+changelog=0.1.0 - Initial release: KDE/Voronoi-based settlement partitioning.
 
 # Tags are comma separated with spaces allowed
-tags=python
+tags=python, settlement, partitioning, voronoi, kde, geodata, vector
 
-homepage=https://github.com/K3lT10N/IB-Tool_3_Partitionierung
-tracker=https://github.com/K3lT10N/IB-Tool_3_Partitionierung/issues
-repository=https://github.com/K3lT10N/IB-Tool_3_Partitionierung
-category=Plugins
+homepage=https://github.com/IB-Tool/ibtoolpartion
+category=Vector
 icon=icon.png
 # experimental flag
 experimental=True
@@ -39,9 +38,6 @@ deprecated=False
 # (or upgraded) can be specified.
 # Check the documentation for more information.
 # plugin_dependencies=
-
-Category of the plugin: Raster, Vector, Database or Web
-# category=
 
 # If the plugin can run on QGIS Server.
 server=False

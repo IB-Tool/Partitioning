@@ -39,7 +39,6 @@ jobs:
       - name: detect-secrets (secrets)
         run: |
           detect-secrets scan --force-use-all-plugins \
-            --exclude-files 'Test_data/.*' \
             > /tmp/secrets.json
           python - <<'PY'
           import json, sys

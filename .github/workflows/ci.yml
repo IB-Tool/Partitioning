@@ -1,7 +1,4 @@
-# CI with Docker-based QGIS test runner.
-# Requires a Dockerfile at the repo root that sets up QGIS and runs pytest.
-# See IB-Tool-3 for a reference implementation.
-
+# CI with Docker-based QGIS test runner (Dockerfile at the repo root).
 name: CI
 
 on:

@@ -38,7 +38,10 @@
       "PowerShell(& \"C:\\\\OSGeo4W\\\\apps\\\\qt5\\\\bin\\\\lrelease.exe\" \"C:\\\\Users\\\\Oliver\\\\AppData\\\\Roaming\\\\QGIS\\\\QGIS3\\\\profiles\\\\default\\\\python\\\\plugins\\\\ibtoolpartion\\\\i18n\\\\IbToolPartition_de.ts\" -qm \"C:\\\\Users\\\\Oliver\\\\AppData\\\\Roaming\\\\QGIS\\\\QGIS3\\\\profiles\\\\default\\\\python\\\\plugins\\\\ibtoolpartion\\\\i18n\\\\IbToolPartition_de.qm\")",
       "PowerShell(& \"C:\\\\OSGeo4W\\\\apps\\\\qt5\\\\bin\\\\lrelease.exe\" 2>&1 | Select-Object -First 3)",
       "PowerShell(lrelease *)",
-      "Bash(.venv\\\\Scripts\\\\python -m pip show pytest-cov)"
+      "Bash(.venv\\\\Scripts\\\\python -m pip show pytest-cov)",
+      "Bash(where detect-secrets-hook *)",
+      "Bash(where python *)",
+      "Bash(C:\\\\Python37\\\\python.exe *)"
     ]
   },
   "hooks": {

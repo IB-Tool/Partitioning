@@ -2,6 +2,13 @@
 
 This document covers the development setup, CI/CD pipeline, test structure, and code quality tooling for IB-Tool (Partitioning).
 
+This plugin is a companion to **[IBTool](https://github.com/IB-Tool/IB-Tool-3)**
+(the main plugin) and follows the same development conventions. For the
+canonical description of the CI/test/release approach shared by all three
+IB-Tool plugins, see
+[IBTool's own `docs/contributing.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/contributing.md).
+This document only covers what differs here.
+
 ---
 
 ## Continuous Integration with GitHub Actions
@@ -21,12 +28,15 @@ Runs the full test suite inside a Docker container with a real QGIS environment.
 
 Steps:
 1. Checks out the repository
-2. Builds the Docker image from `Dockerfile` (must be provided at the repo root)
+2. Builds the Docker image from `Dockerfile` at the repo root
 3. Runs the test suite inside the container with coverage reporting
 4. Strips container-absolute paths from `coverage.xml`
 5. Uploads the coverage report to Codecov
 
-See `.github/workflows/ci.yml` for the full workflow definition and `IB-Tool-3` for a reference `Dockerfile`.
+See `.github/workflows/ci.yml` and `Dockerfile` for the full definitions. The
+image is a slimmed-down variant of IBTool's own `Dockerfile` — this plugin
+has no runtime dependencies beyond QGIS's own processing algorithms, so
+`numpy`/`scipy`/`networkx` are not installed.
 
 ### Coverage Reporting
 
@@ -62,8 +72,30 @@ pip install flake8 bandit detect-secrets
 python ci/qgis_plugin_validate.py --auto
 flake8 .
 bandit -r . -ll
-detect-secrets scan --force-use-all-plugins --exclude-files 'Test_data/.*'
+detect-secrets scan --force-use-all-plugins
 ```
+
+---
+
+## Release Process
+
+Releases are built with `scripts/create_release_zip.py`, mirroring IBTool's
+own release process (see
+[IBTool's `docs/contributing.md` → Release Process](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/contributing.md)
+for the full rationale). There is no automated GitHub release workflow —
+the ZIP is built and uploaded to GitHub Releases manually:
+
+```bash
+python ci/qgis_plugin_validate.py --auto
+python scripts/create_release_zip.py
+python ci/qgis_plugin_validate.py --zip dist/*.zip
+```
+
+This produces `dist/ibtoolpartion.<version>.zip`. Bump `version` in
+`metadata.txt` and add a corresponding entry to
+[`docs/CHANGELOG.md`](CHANGELOG.md) before tagging a release. See
+[`ai/core/release-conventions.md`](../ai/core/release-conventions.md) for
+the full invariants (required metadata keys, LICENSE file, folder naming).
 
 ---
 

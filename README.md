@@ -1,6 +1,18 @@
 # IB-Tool (Partitioning) — QGIS Plugin
 
+[![CI](https://github.com/IB-Tool/ibtoolpartion/actions/workflows/ci.yml/badge.svg)](https://github.com/IB-Tool/ibtoolpartion/actions/workflows/ci.yml)
+[![QGIS Plugin CI](https://github.com/IB-Tool/ibtoolpartion/actions/workflows/qgis-plugin-ci.yml/badge.svg)](https://github.com/IB-Tool/ibtoolpartion/actions/workflows/qgis-plugin-ci.yml)
+[![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](LICENSE)
+
 A QGIS plugin that delineates settlement boundaries by partitioning spatial datasets based on building footprints.
+
+This is a companion plugin to **[IBTool](https://github.com/IB-Tool/IB-Tool-3)**:
+its output (a `PART_<id>` polygon layer) is the **Partitions** input IBTool
+expects — see IBTool's
+[`docs/input-data.md` → Part](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/input-data.md#part--partitioning)
+and
+[`docs/quickstart.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/quickstart.md)
+for how it fits into IBTool's own workflow.
 
 ---
 
@@ -104,13 +116,23 @@ docker build -t qgis-plugin-test .
 docker run --rm -v $(pwd):/plugins/ibtoolpartion qgis-plugin-test
 ```
 
+### Build a release ZIP
+
+```bash
+python scripts/create_release_zip.py
+```
+
+Produces `dist/ibtoolpartion.<version>.zip`. See
+[`docs/contributing.md` → Release Process](docs/contributing.md#release-process)
+for the full checklist.
+
 ### Static analysis
 
 ```bash
 python ci/qgis_plugin_validate.py --auto
 flake8 .
 bandit -r . -ll
-detect-secrets scan --force-use-all-plugins --exclude-files 'Test_data/.*'
+detect-secrets scan --force-use-all-plugins
 ```
 
 ### Test markers
@@ -144,7 +166,7 @@ This plugin is based on the following published toolset:
 ## License
 
 This plugin is released under the **GNU General Public License v2** (or later).
-See `Test_data/LICENSE.txt` for the license text of the bundled test data.
+See [`LICENSE`](LICENSE) for the full license text.
 
 ---
 

@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- `Dockerfile` for Docker-based test execution (previously referenced by `ci.yml`/`docs/contributing.md` but missing).
+- `scripts/create_release_zip.py` — release ZIP builder, mirroring IBTool's own script.
+- Cross-links to IBTool's documentation (README, `docs/contributing.md`) describing this plugin's role as IBTool's Partitions input provider.
+
+### Fixed
+- `metadata.txt`: replaced placeholder `tracker`/`repository`/`homepage` URLs (`http://bugs`, `http://repo`, `http://homepage`) with the actual repository URLs; removed a stray unescaped line that was silently parsed as a bogus `category of the plugin` key; added a `changelog` entry (previously commented out).
+- `README.md`: removed incorrect reference to a non-existent `Test_data/LICENSE.txt`; removed stale `Test_data/.*` exclude pattern from `detect-secrets` examples (no such directory exists in this repo).
+- `.github/workflows/ci.yml`: removed the "Dockerfile missing, see IB-Tool-3" comment now that a `Dockerfile` exists here.
+
 ---
 
 ## 0.1.0 — 2026-06-21
