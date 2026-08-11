@@ -28,6 +28,9 @@ ENV QT_QPA_PLATFORM=offscreen
 ENV QGIS_PREFIX_PATH=/usr
 ENV PYTHONPATH=/plugins:/usr/share/qgis/python:/usr/share/qgis/python/plugins
 ENV QGIS_PLUGINPATH=/usr/share/qgis/python/plugins
+# Ungepuffertes stdout/stderr, damit die CI-Logs live mitlaufen statt in
+# einem Block-Puffer zu verschwinden, falls ein Test hängt.
+ENV PYTHONUNBUFFERED=1
 
 # Arbeitsverzeichnis für die Testausführung
 WORKDIR /plugins/ibtoolpartion
