@@ -40,5 +40,9 @@ WORKDIR /plugins/ibtoolpartion
 #    QT_QPA_PLATFORM=offscreen intern einen Display benötigt.
 #    --timeout bricht einen einzelnen hängenden Test nach 5 Minuten ab und
 #    meldet ihn (statt dass der ganze CI-Job unbegrenzt hängen bleibt).
-CMD ["xvfb-run", "-a", "python3", "-m", "pytest", "--tb=short", "--timeout=300"]
+#    Die echo-Marker sind ein Diagnose-Hilfsmittel: Bisher gab es in den
+#    CI-Logs an dieser Stelle NULL Ausgabe, selbst nach PYTHONUNBUFFERED=1.
+#    Damit lässt sich beim nächsten Lauf sehen, ob schon xvfb-run/Xvfb
+#    hängt oder erst pytest (Collection oder ein einzelner Test).
+CMD ["sh", "-c", "echo '[ci] launching xvfb-run'; xvfb-run -a sh -c 'echo \"[ci] Xvfb ready - starting pytest\"; python3 -m pytest --tb=short --timeout=300'"]
 
