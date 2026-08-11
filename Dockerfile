@@ -12,7 +12,8 @@ RUN apt-get update \
     xvfb \
     python3-pytest \
     python3-pip \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && pip3 install --no-cache-dir --break-system-packages pytest-timeout
 
 # 4. Arbeitsverzeichnis im Container
 WORKDIR /plugins
@@ -34,5 +35,7 @@ WORKDIR /plugins/ibtoolpartion
 # 7. Testsuite beim Containerstart ausführen.
 #    xvfb-run stellt einen virtuellen X-Server bereit, falls QGIS trotz
 #    QT_QPA_PLATFORM=offscreen intern einen Display benötigt.
-CMD ["xvfb-run", "-a", "python3", "-m", "pytest", "--tb=short"]
+#    --timeout bricht einen einzelnen hängenden Test nach 5 Minuten ab und
+#    meldet ihn (statt dass der ganze CI-Job unbegrenzt hängen bleibt).
+CMD ["xvfb-run", "-a", "python3", "-m", "pytest", "--tb=short", "--timeout=300"]
 
