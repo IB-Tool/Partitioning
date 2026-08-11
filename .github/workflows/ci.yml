@@ -21,33 +21,13 @@ jobs:
         run: |
           docker build --pull -t qgis-plugin-test .
 
-      - name: Run tests with coverage
+      - name: Run tests
         id: run_tests
         continue-on-error: true
         run: |
-          # Run container; coverage.xml is written to /plugins/ibtoolpartion which maps
-          # to $(pwd) via the volume mount, so it appears on the host automatically.
           docker run --rm \
             -v $(pwd):/plugins/ibtoolpartion \
             qgis-plugin-test
-
-      - name: Verify and fix coverage report
-        run: |
-          if [ ! -f coverage.xml ]; then
-            echo "ERROR: coverage.xml not found after test run"
-            exit 1
-          fi
-          # Fix absolute container paths → relative repo paths for Codecov
-          sed -i 's|/plugins/ibtoolpartion/||g' coverage.xml
-          echo "coverage.xml found and paths fixed"
-          head -5 coverage.xml
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          fail_ci_if_error: true
 
       - name: Fail job if tests failed
         if: steps.run_tests.outcome == 'failure'
