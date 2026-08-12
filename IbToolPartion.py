@@ -184,9 +184,9 @@ class IbToolPartition:
 
         filename, _filter = QFileDialog.getSaveFileName(
             self.dlg,
-            "Select output file",
+            self.tr("Select output file"),
             "",
-            'Shapefiles (*.shp);;GeoPackage (*.gpkg);;All Files (*)'
+            self.tr('Shapefiles (*.shp);;GeoPackage (*.gpkg);;All Files (*)')
         )
 
         if filename:
@@ -195,7 +195,8 @@ class IbToolPartition:
     def select_input_file(self):
         """Open an open-file dialog and write the chosen path to the dialog."""
         filename, _filter = QFileDialog.getOpenFileName(
-            self.dlg, "Select input file ", "", '*.shp, *.gpkg')
+            self.dlg, self.tr("Select input file"),
+            "", self.tr('Vector files (*.shp *.gpkg)'))
         self.dlg.Input_HU.setText(filename)
 
     def siedgr(self, input_hu, cell_size, filename):  # pylint: disable=too-many-locals
