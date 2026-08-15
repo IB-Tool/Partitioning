@@ -11,6 +11,8 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     xvfb \
     python3-pytest \
+    python3-pytest-cov \
+    python3-coverage \
     python3-pip \
  && rm -rf /var/lib/apt/lists/* \
  && pip3 install --no-cache-dir --break-system-packages pytest-timeout
@@ -44,5 +46,5 @@ WORKDIR /plugins/ibtoolpartion
 #    CI-Logs an dieser Stelle NULL Ausgabe, selbst nach PYTHONUNBUFFERED=1.
 #    Damit lässt sich beim nächsten Lauf sehen, ob schon xvfb-run/Xvfb
 #    hängt oder erst pytest (Collection oder ein einzelner Test).
-CMD ["sh", "-c", "echo '[ci] launching xvfb-run'; xvfb-run -a sh -c 'echo \"[ci] Xvfb ready - starting pytest\"; python3 -m pytest --tb=short --timeout=300'"]
+CMD ["sh", "-c", "echo '[ci] launching xvfb-run'; xvfb-run -a sh -c 'echo \"[ci] Xvfb ready - starting pytest\"; python3 -m pytest --tb=short --timeout=300 --cov --cov-report=xml --cov-report=html'"]
 

@@ -1,13 +1,29 @@
 # -*- coding: utf-8 -*-
 """
 Pytest configuration and fixtures for IbToolPartition plugin tests.
+
+CRITICAL: no QGIS imports in this file. conftest.py is loaded as a pytest
+plugin before test collection; importing qgis.core here triggers QGIS' own
+import hook (qgis.utils._import) and causes a circular-import error. QGIS
+imports belong in the test modules themselves, after get_qgis_app().
 """
+import sys
 import tempfile
 import shutil
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
+
+# The plugin folder name ('ibtoolpartion') is already a valid Python
+# identifier, so - unlike IB-Tool-3 - no types.ModuleType alias stub is
+# needed here. Adding the parent directory to sys.path makes
+# 'import ibtoolpartion.X' resolve locally exactly as it does in the
+# container, where PYTHONPATH=/plugins and the plugin lives at
+# /plugins/ibtoolpartion.
+_PLUGIN_PARENT = str(Path(__file__).resolve().parent.parent.parent)
+if _PLUGIN_PARENT not in sys.path:
+    sys.path.insert(0, _PLUGIN_PARENT)
 
 
 @pytest.fixture
@@ -18,15 +34,6 @@ def temp_dir():
     temp_dir = tempfile.mkdtemp()
     yield Path(temp_dir)
     shutil.rmtree(temp_dir, ignore_errors=True)
-
-
-@pytest.fixture
-def sample_shapefile_path():
-    """
-    Fixture that provides path to test shapefile.
-    """
-    test_data_dir = Path(__file__).parent.parent / "Test_data"
-    return test_data_dir
 
 
 @pytest.fixture
@@ -50,23 +57,3 @@ def plugin_dir():
     Fixture that provides the plugin directory path.
     """
     return Path(__file__).parent.parent
-
-
-@pytest.fixture
-def mock_qgis_modules():
-    """
-    Fixture that provides mocked QGIS modules.
-    """
-    qgis_mocks = {
-        'qgis': MagicMock(),
-        'qgis.PyQt': MagicMock(),
-        'qgis.PyQt.QtCore': MagicMock(),
-        'qgis.PyQt.QtGui': MagicMock(),
-        'qgis.PyQt.QtWidgets': MagicMock(),
-        'qgis.core': MagicMock(),
-        'qgis.gui': MagicMock(),
-        'qgis.processing': MagicMock(),
-    }
-
-    with patch.dict('sys.modules', qgis_mocks):
-        yield qgis_mocks

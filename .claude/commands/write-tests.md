@@ -32,21 +32,27 @@ Search `test/` for an existing test file for `$ARGUMENTS`:
 If a test file **exists**: extend it, do not replace it.
 If no test file exists: create `test/test_<snake_case_name>.py`.
 
+Also check `docs/test-strategy.md` §Module-to-Test Mapping to understand the current test count and documented gaps for this module.
+
 ## Step 3 — Consult project rules (mandatory)
 
 Read **all** of these files before writing any code:
 
-1. `ai/core/testing-rules.md` — tier definitions, coverage targets, structure
-2. `ai/core/qgis-api-rules.md` — QGIS API compatibility rules
-3. `ai/core/constraints.md` — language and naming rules
+1. `docs/test-strategy.md` — **authoritative reference**: tier definitions, coverage targets, module mapping, gap backlog, edge case catalog, fixture scope rules
+2. `ai/core/testing-rules.md` — tactical rules: geometry checks, structure, framework
+3. `ai/core/qgis-api-rules.md` — QGIS API compatibility rules
+4. `ai/core/constraints.md` — language and naming rules
 
 Also read:
 - `test/utilities.py` — QGIS app initialisation helper
 - `test/conftest.py` — shared fixtures
+- `test/layer_factories.py` — shared layer/geometry factory helpers (import AFTER `get_qgis_app()`)
+
+For an example of a well-structured test file, read `test/test_siedgr_integration.py`.
 
 ## Step 4 — Write the test file
 
-### Tier decision
+### Tier decision (from `docs/test-strategy.md` §Test Taxonomy)
 
 ```
 Does the function under test call processing.run()?

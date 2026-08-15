@@ -302,8 +302,8 @@ class TestIbToolPartitionSiedgr:
         result = plugin.siedgr("input.shp", 1, "output.shp")
         assert result == "output.shp"
 
-    @pytest.mark.integration
-    def test_siedgr_output_has_features(self, plugin):
+    @pytest.mark.unit
+    def test_siedgr_invokes_twelve_processing_steps(self, plugin):
         """siedgr() runs all 12 processing steps and threads the output path to the final step."""
         processing = sys.modules["qgis"].processing
         processing.run.reset_mock()
@@ -317,8 +317,8 @@ class TestIbToolPartitionSiedgr:
         last_call = processing.run.call_args_list[-1]
         assert last_call.args[1]['OUTPUT'] == "output.shp"
 
-    @pytest.mark.integration
-    def test_siedgr_output_contains_name_field(self, plugin):
+    @pytest.mark.unit
+    def test_siedgr_configures_fieldcalculator_for_name_field(self, plugin):
         """siedgr() passes FIELD_NAME='NAME' and FORMULA=\"'PART_' || $id\" to fieldcalculator."""
         processing = sys.modules["qgis"].processing
         processing.run.reset_mock()
