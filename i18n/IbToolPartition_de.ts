@@ -47,6 +47,22 @@
         <source>Output file written at {}</source>
         <translation>Ausgabedatei gespeichert unter {}</translation>
     </message>
+    <message>
+        <source>Select output file</source>
+        <translation>Ausgabedatei auswählen</translation>
+    </message>
+    <message>
+        <source>Select input file</source>
+        <translation>Eingabedatei auswählen</translation>
+    </message>
+    <message>
+        <source>Shapefiles (*.shp);;GeoPackage (*.gpkg);;All Files (*)</source>
+        <translation>Shapefiles (*.shp);;GeoPackage (*.gpkg);;Alle Dateien (*)</translation>
+    </message>
+    <message>
+        <source>Vector files (*.shp *.gpkg)</source>
+        <translation>Vektordateien (*.shp *.gpkg)</translation>
+    </message>
 </context>
 <context>
     <name>IbToolPartitionDialogBase</name>

@@ -130,9 +130,15 @@ pytest test/ -v -m unit
 | `@pytest.mark.unit` | No `processing.run()` calls — fast, no QGIS needed |
 | `@pytest.mark.integration` | Calls `processing.run()` — requires QGIS |
 | `@pytest.mark.edge_case` | Boundary / degenerate inputs |
-| `@pytest.mark.slow` | Runtime > 1 s or large synthetic datasets |
+| `@pytest.mark.performance` | Measures runtime/scaling behaviour |
+| `@pytest.mark.slow` | Long-running test, excluded via `-m "not slow"` |
 
-See `ai/core/testing-rules.md` for full testing conventions.
+Coverage is configured in `.coveragerc` (`source = ibtoolpartion, scripts`;
+`Partitioning.pyt`, `resources.py`, and `test/` are omitted).
+
+See [`docs/test-strategy.md`](test-strategy.md) for the authoritative test
+strategy (tier definitions, coverage targets, module-to-test mapping, gap
+backlog) and `ai/core/testing-rules.md` for the tactical rules.
 
 ---
 
@@ -153,6 +159,7 @@ The `ai/` directory contains rules and task templates for AI-assisted developmen
 | File | Content |
 |------|---------|
 | [`docs/CHANGELOG.md`](CHANGELOG.md) | Version history |
+| [`docs/test-strategy.md`](test-strategy.md) | Authoritative test strategy: tiers, coverage targets, module mapping, gap backlog |
 | [`ai/core/testing-rules.md`](../ai/core/testing-rules.md) | Test conventions |
 | [`ai/core/constraints.md`](../ai/core/constraints.md) | Language and code constraints |
 | [`ci/qgis_plugin_validate.py`](../ci/qgis_plugin_validate.py) | Plugin structure validator |
