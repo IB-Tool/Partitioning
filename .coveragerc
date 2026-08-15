@@ -1,0 +1,16 @@
+# .coveragerc
+[run]
+source =
+    ibtoolpartion
+    scripts
+omit =
+    */test/*
+    */tests/*
+    */__pycache__/*
+    */build/*
+    */dist/*
+    */venv/*
+    */.venv/*
+    */resources.py
+    */ui_*.py
+    */Partitioning.pyt

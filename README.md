@@ -14,6 +14,11 @@ and
 [`docs/quickstart.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/quickstart.md)
 for how it fits into IBTool's own workflow.
 
+IBTool needs four more input layers. Its sibling plugin
+**[Data Wizard](https://github.com/IB-Tool/data_wizard)** produces the
+`HU` / `RN` / `Aux` layers from raw ATKIS Basis-DLM data — the building
+footprints it outputs can be fed straight into this plugin as input.
+
 ---
 
 ## What it does
