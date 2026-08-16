@@ -6,7 +6,7 @@ This document is the single authoritative reference for **why** the test suite i
 - A tutorial on pytest syntax — see the pytest documentation.
 - A list of tactical rules for geometry checks or test structure — see [`ai/core/testing-rules.md`](../ai/core/testing-rules.md).
 
-This plugin is a companion to **[IBTool](https://github.com/IB-Tool/IB-Tool-3)** and mirrors its testing conventions at a scale appropriate for a single-module plugin. See [IBTool's own `docs/test-strategy.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/test-strategy.md) for the full-size version of this document.
+This plugin is a companion to **[IB-Tool 3](https://github.com/IB-Tool/IB-Tool-3)** and mirrors its testing conventions at a scale appropriate for a single-module plugin. See [IB-Tool 3's own `docs/test-strategy.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/test-strategy.md) for the full-size version of this document.
 
 ---
 
@@ -209,6 +209,8 @@ def test_single_building(self, plugin, tmp_path):
 |---|---|
 | Full `run()` success path untested | Add a unit test that configures the mock dialog with valid paths/`cell_size`, stubs `siedgr()`, and asserts the success `pushMessage` call |
 | No `@pytest.mark.performance` test for `siedgr()` at scale | Add a `performance` + `slow` test with 50+ buildings, asserting it completes within a stated time budget |
+| A missing `qgis:heatmapkerneldensityestimation` skips every `siedgr()` integration test without failing | The collection-time `skipif` in `test_siedgr_integration.py` keeps the suite green even when the algorithm is absent from the Processing build — CI then reports success while `siedgr()` has zero real coverage. In the Docker image the algorithm *must* be present: make its absence a hard error there (assert it is registered when `QGIS_PREFIX_PATH=/usr`) and keep the skip for local runs only |
+| `siedgr()` is a single ~120-line method with 12 `processing.run()` calls | Its steps cannot be tested individually — any failing step surfaces as "the whole pipeline is wrong". Splitting it into named steps (centroids → heatmap → voronoi → cleanup → polygonize) would let the integration tests pinpoint failures. It also still writes to stdout via `print()` instead of the QGIS logger (`IbToolPartion.py`, `run()`) |
 
 ### Priority 2 — Larger effort, lower urgency
 
@@ -262,4 +264,3 @@ pytest test/test_siedgr_integration.py -v
 |------|---------|
 | [`docs/contributing.md`](contributing.md) | CI/CD pipeline, Docker environment, code linting |
 | [`ai/core/testing-rules.md`](../ai/core/testing-rules.md) | Tactical rules: geometry checks, test structure, framework conventions |
-| [`docs/Testplan-data_wizard-ibtoolpartion.md`](Testplan-data_wizard-ibtoolpartion.md) | Implementation plan this document and the current test suite were built from |
