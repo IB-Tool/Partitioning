@@ -7,14 +7,13 @@ steps for real, against building-footprint layers generated in-memory with
 test/layer_factories.py and written to tmp_path — no test data checked into
 the repository is needed.
 
-Requires a full QGIS Processing environment (Docker, see
-docs/Testplan-data_wizard-ibtoolpartion.md Phase 3.2). All tests are skipped
+Requires a full QGIS Processing environment (Docker). All tests are skipped
 automatically when QGIS is unavailable, and again when the
 qgis:heatmapkerneldensityestimation algorithm siedgr() depends on is not
-registered in the running QGIS/Processing build (this is checked at
-collection time instead of via the one-off Docker experiment described in
-the plan, so the gap is self-documenting no matter which QGIS image runs
-these tests).
+registered in the running QGIS/Processing build (checked at collection time,
+so the gap is self-documenting no matter which QGIS image runs these tests -
+see docs/test-strategy.md, Gap Analysis, on why a silent skip is not enough
+in CI).
 """
 # pylint: disable=possibly-used-before-assignment
 # QgsWkbTypes/QgsVectorLayer/IbToolPartition/the layer_factories imports are

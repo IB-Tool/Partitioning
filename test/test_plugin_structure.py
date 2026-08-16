@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """Structural tests that don't require QGIS to be available.
 
-Taken over from the former test/test_test.py (dissolved — see
-docs/Testplan-data_wizard-ibtoolpartion.md Phase 3.3). The other tests that
-used to live there duplicated coverage found elsewhere or tested the Python
-standard library / MagicMock itself and carried no assertion value, so they
-were dropped rather than moved.
+Taken over from the former test/test_test.py, which was dissolved. The other
+tests that used to live there duplicated coverage found elsewhere or tested
+the Python standard library / MagicMock itself and carried no assertion
+value, so they were dropped rather than moved.
 """
 import sys
 from pathlib import Path
