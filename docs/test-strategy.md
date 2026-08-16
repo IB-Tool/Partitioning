@@ -6,7 +6,7 @@ This document is the single authoritative reference for **why** the test suite i
 - A tutorial on pytest syntax — see the pytest documentation.
 - A list of tactical rules for geometry checks or test structure — see [`ai/core/testing-rules.md`](../ai/core/testing-rules.md).
 
-This plugin is a companion to **[IBTool](https://github.com/IB-Tool/IB-Tool-3)** and mirrors its testing conventions at a scale appropriate for a single-module plugin. See [IBTool's own `docs/test-strategy.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/test-strategy.md) for the full-size version of this document.
+This plugin is a companion to **[IB-Tool 3](https://github.com/IB-Tool/IB-Tool-3)** and mirrors its testing conventions at a scale appropriate for a single-module plugin. See [IB-Tool 3's own `docs/test-strategy.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/test-strategy.md) for the full-size version of this document.
 
 ---
 
