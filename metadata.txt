@@ -12,8 +12,8 @@ email=ottmar.hittzfeld@web.de
 
 about=This tool generates a partition of the dataset based on building footprints.
 
-tracker=https://github.com/IB-Tool/ibtoolpartion/issues
-repository=https://github.com/IB-Tool/ibtoolpartion
+tracker=https://github.com/IB-Tool/Partitioning/issues
+repository=https://github.com/IB-Tool/Partitioning
 license=GPL-2.0-or-later
 # End of mandatory metadata
 
@@ -25,7 +25,7 @@ changelog=0.1.0 - Initial release: KDE/Voronoi-based settlement partitioning.
 # Tags are comma separated with spaces allowed
 tags=python, settlement, partitioning, voronoi, kde, geodata, vector
 
-homepage=https://github.com/IB-Tool/ibtoolpartion
+homepage=https://github.com/IB-Tool/Partitioning
 category=Vector
 icon=icon.png
 # experimental flag
