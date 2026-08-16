@@ -2,11 +2,11 @@
 
 This document covers the development setup, CI/CD pipeline, test structure, and code quality tooling for IB-Tool (Partitioning).
 
-This plugin is a companion to **[IBTool](https://github.com/IB-Tool/IB-Tool-3)**
+This plugin is a companion to **[IB-Tool 3](https://github.com/IB-Tool/IB-Tool-3)**
 (the main plugin) and follows the same development conventions. For the
 canonical description of the CI/test/release approach shared by all three
 IB-Tool plugins, see
-[IBTool's own `docs/contributing.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/contributing.md).
+[IB-Tool 3's own `docs/contributing.md`](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/contributing.md).
 This document only covers what differs here.
 
 ---
@@ -34,7 +34,7 @@ Steps:
 5. Uploads the coverage report to Codecov
 
 See `.github/workflows/ci.yml` and `Dockerfile` for the full definitions. The
-image is a slimmed-down variant of IBTool's own `Dockerfile` — this plugin
+image is a slimmed-down variant of IB-Tool 3's own `Dockerfile` — this plugin
 has no runtime dependencies beyond QGIS's own processing algorithms, so
 `numpy`/`scipy`/`networkx` are not installed.
 
@@ -79,9 +79,9 @@ detect-secrets scan --force-use-all-plugins
 
 ## Release Process
 
-Releases are built with `scripts/create_release_zip.py`, mirroring IBTool's
+Releases are built with `scripts/create_release_zip.py`, mirroring IB-Tool 3's
 own release process (see
-[IBTool's `docs/contributing.md` → Release Process](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/contributing.md)
+[IB-Tool 3's `docs/contributing.md` → Release Process](https://github.com/IB-Tool/IB-Tool-3/blob/master/docs/contributing.md)
 for the full rationale). There is no automated GitHub release workflow —
 the ZIP is built and uploaded to GitHub Releases manually:
 
